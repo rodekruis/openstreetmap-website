@@ -1,5 +1,4 @@
 //= require iD
-//= require jquery
 
 /* globals iD */
 
@@ -12,13 +11,6 @@ document.addEventListener("DOMContentLoaded", function() {
       'Please upgrade your browser or use Potlatch 2 to edit the map.';
     container.className = 'unsupported';
   } else {
-    iD.data.imagery = [];
-    delete iD.services.geocoder;
-    delete iD.services.mapillary;
-    delete iD.services.taginfo;
-    delete iD.services.wikidata;
-    delete iD.services.wikipedia;
-
     var id = iD.Context()
       .embed(true)
       .assetPath("iD/")
@@ -31,14 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
         oauth_token: container.dataset.token,
         oauth_token_secret: container.dataset.tokenSecret
       });
-
-    // load iD.data.imagery
-    $.getJSON('http://posm.io/posm_imagery.json', function(data) {
-      iD.data.imagery = data.dataImagery;
-
-      // refresh lists of available imagery
-      id.background().init();
-    });
 
     id.map().on('move.embed', parent.$.throttle(250, function() {
       if (id.inIntro()) return;
