@@ -121,8 +121,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // override feature filter limits
     //
     var f = id.features().features();
-    f.points.currentMax = f.points.defaultMax = 99999
-    f.buildings.currentMax = f.buildings.defaultMax = 99999
+    f.points.currentMax = f.points.defaultMax = 300;
+    f.buildings.currentMax = f.buildings.defaultMax = 300;
 
 
     id.map().on('move.embed', parent.$.throttle(250, function() {
