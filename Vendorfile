@@ -51,7 +51,7 @@ folder 'vendor/assets' do
   end
 
   folder 'iD' do
-    from 'git://github.com/bhousel/iD', :branch => 'custom-damage-assessment' do
+    from 'git://github.com/hotosm/iD', :branch => 'custom-damage-assessment' do
       folder 'iD/img', 'dist/img'
       folder 'iD/locales', 'dist/locales'
       folder 'iD/traffico', 'dist/traffico'
