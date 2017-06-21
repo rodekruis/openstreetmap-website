@@ -121,4 +121,5 @@ group :development, :test do
   gem "jshint"
   gem "konacha"
   gem "poltergeist"
+  gem "puma"
 end
