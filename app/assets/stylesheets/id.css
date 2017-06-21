@@ -1,3 +1,49 @@
 /*
  *= require iD
  */
+
+/* custom styles */
+.preset-icon-fill-point {
+    cursor: inherit;
+    height: 100%;
+    width: 100%;
+}
+
+.node.tag-damage-none path.stroke {
+    fill: #80ff80;
+}
+.node.tag-damage-none use {
+    fill: #008000;
+}
+.preset-icon-fill.tag-damage-none {
+    background-color: #80ff80;
+}
+.preset-icon-fill.tag-damage-none + .preset-icon use {
+    fill: #008000;
+}
+
+.node.tag-damage-some path.stroke {
+    fill: #ffff80;
+}
+.node.tag-damage-some use {
+    fill: #806000;
+}
+.preset-icon-fill.tag-damage-some {
+    background-color: #ffff80;
+}
+.preset-icon-fill.tag-damage-some + .preset-icon use {
+    fill: #806000;
+}
+
+.node.tag-damage-destroyed path.stroke {
+    fill: #ff8080;
+}
+.node.tag-damage-destroyed use {
+    fill: #800000;
+}
+.preset-icon-fill.tag-damage-destroyed {
+    background-color: #ff8080;
+}
+.preset-icon-fill.tag-damage-destroyed + .preset-icon use {
+    fill: #800000;
+}

@@ -24,6 +24,107 @@ document.addEventListener("DOMContentLoaded", function() {
         oauth_token_secret: container.dataset.tokenSecret
       });
 
+
+    //
+    // custom presets
+    //
+    iD.data.presets = {
+
+        presets: {
+           "area": {
+                "name": "Area",
+                "tags": {},
+                "geometry": ["area"],
+                "searchable": false
+            },
+            "line": {
+                "name": "Line",
+                "tags": {},
+                "geometry": ["line"],
+                "searchable": false
+            },
+            "vertex": {
+                "name": "Vertex",
+                "tags": {},
+                "geometry": ["vertex"],
+                "searchable": false
+            },
+            "relation": {
+                "name": "Relation",
+                "tags": {},
+                "geometry": ["relation"],
+                "searchable": false
+            },
+
+            "point": {
+                "name": "Assess Damage",
+                "tags": {},
+                "geometry": ["point"],
+                "fields": ["damage"]
+            },
+            "building_no_damage": {
+                "icon": "home",
+                "name": "Building - No Damage",
+                "tags": { "damage": "none" },
+                "geometry": ["point"],
+                "fields": ["damage"]
+            },
+            "building_some_damage": {
+                "icon": "home",
+                "name": "Building - Some Damage",
+                "tags": { "damage": "some" },
+                "geometry": ["point"],
+                "fields": ["damage"]
+            },
+            "building_destroyed": {
+                "icon": "home",
+                "name": "Building - Destroyed",
+                "tags": { "damage": "destroyed" },
+                "geometry": ["point"],
+                "fields": ["damage"]
+            },
+        },
+
+        "defaults": {
+            "area": [],
+            "line": [],
+            "point": [
+                "building_no_damage",
+                "building_some_damage",
+                "building_destroyed",
+                "point"
+            ],
+            "vertex": [],
+            "relation": []
+        },
+
+        categories: { },
+
+        fields: {
+            "damage": {
+                "key": "damage",
+                "type": "radio",
+                "label": "Building Damage",
+                "options": [
+                    "none",
+                    "some",
+                    "destroyed"
+                ]
+            }
+        }
+    };
+
+    id.presets().init();
+
+
+    //
+    // override feature filter limits
+    //
+    var f = id.features().features();
+    f.points.currentMax = f.points.defaultMax = 300;
+    f.buildings.currentMax = f.buildings.defaultMax = 300;
+
+
     id.map().on('move.embed', parent.$.throttle(250, function() {
       if (id.inIntro()) return;
       var zoom = ~~id.map().zoom(),

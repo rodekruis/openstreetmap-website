@@ -845,7 +845,7 @@
                 "rightclick_intersection": "The last real street is {street1}, so we will *split* {street2} at this intersection and remove everything above it. **Right click on the intersection node.**",
                 "split_intersection": "**Click on the {button} button to split {street}.**",
                 "retry_split": "You didn't click the Split button. Try again.",
-                "did_split_multi": "Good Job! {street1} is now split into two pieces. The top part can be removed. **Click the top part of {street2} to select it.**",
+                "did_split_multi": "Good job! {street1} is now split into two pieces. The top part can be removed. **Click the top part of {street2} to select it.**",
                 "did_split_single": "**Click the top part of {street2} to select it.**",
                 "multi_select": "{selected} is now selected. Let's also select {other1}. You can shift-click to select multiple things. **Shift-click on {other2}.**",
                 "multi_rightclick": "Good! Both lines to delete are now selected. **Right-click on one of the lines to show the edit menu.**",
@@ -1268,6 +1268,9 @@
                         }
                     }
                 },
+                "damage": {
+                    "label": "Building Damage"
+                },
                 "date": {
                     "label": "Date"
                 },
@@ -1451,7 +1454,7 @@
                     "label": "SSID (Network Name)"
                 },
                 "kerb": {
-                    "label": "Curb Ramp"
+                    "label": "Curb"
                 },
                 "lamp_type": {
                     "label": "Type"
@@ -1540,6 +1543,9 @@
                 },
                 "maxstay": {
                     "label": "Max Stay"
+                },
+                "maxweight": {
+                    "label": "Max Weight"
                 },
                 "mtb/scale": {
                     "label": "Mountain Biking Difficulty",
@@ -2936,6 +2942,10 @@
                     "name": "Electrician",
                     "terms": "power,wire"
                 },
+                "craft/electronics_repair": {
+                    "name": "Electronics Repair Shop",
+                    "terms": ""
+                },
                 "craft/gardener": {
                     "name": "Gardener",
                     "terms": "landscaper,grounds keeper"
@@ -3050,6 +3060,10 @@
                 },
                 "craft/winery": {
                     "name": "Winery",
+                    "terms": ""
+                },
+                "damage": {
+                    "name": "Building Damage",
                     "terms": ""
                 },
                 "embankment": {
@@ -3183,6 +3197,10 @@
                 "highway/cycleway": {
                     "name": "Cycle Path",
                     "terms": "bike"
+                },
+                "highway/elevator": {
+                    "name": "Elevator",
+                    "terms": "lift"
                 },
                 "highway/footway": {
                     "name": "Foot Path",
@@ -3658,7 +3676,7 @@
                 },
                 "leisure/pitch/soccer": {
                     "name": "Soccer Field",
-                    "terms": ""
+                    "terms": "football"
                 },
                 "leisure/pitch/table_tennis": {
                     "name": "Ping Pong Table",
@@ -4089,7 +4107,7 @@
                     "terms": ""
                 },
                 "point": {
-                    "name": "Point",
+                    "name": "Assess Damage",
                     "terms": ""
                 },
                 "power/sub_station": {
@@ -4227,6 +4245,10 @@
                 "shop/antiques": {
                     "name": "Antiques Shop",
                     "terms": ""
+                },
+                "shop/appliance": {
+                    "name": "Appliance Store",
+                    "terms": "air conditioner,appliance,dishwasher,dryer,freezer,fridge,grill,kitchen,oven,refrigerator,stove,washer,washing machine"
                 },
                 "shop/art": {
                     "name": "Art Store",
@@ -4386,7 +4408,7 @@
                 },
                 "shop/electronics": {
                     "name": "Electronics Store",
-                    "terms": "appliance,audio,computer,tv"
+                    "terms": "appliance,audio,blueray,camera,computer,dvd,home theater,radio,speaker,tv,video"
                 },
                 "shop/erotic": {
                     "name": "Erotic Store",
