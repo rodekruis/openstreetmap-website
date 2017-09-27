@@ -68,21 +68,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Building - No Damage",
                 "tags": { "damage": "none" },
                 "geometry": ["point"],
-                "fields": ["damage"]
+                "fields": ["damage","roof"]
             },
             "building_partial_damage": {
                 "icon": "home",
                 "name": "Building - Partial Roof Damage",
                 "tags": { "damage": "partial" },
                 "geometry": ["point"],
-                "fields": ["damage"]
+                "fields": ["damage","roof"]
             },
 	    "building_significant_damage": {
                 "icon": "home",
                 "name": "Building - Significant Roof Damage",
                 "tags": { "damage": "significant" },
                 "geometry": ["point"],
-                "fields": ["damage"]
+                "fields": ["damage","roof"]
             },
 
             "building_destroyed": {
@@ -90,28 +90,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Building - Walls and roof are down",
                 "tags": { "damage": "destroyed" },
                 "geometry": ["point"],
-                "fields": ["damage"]
+                "fields": ["damage","roof"]
             },
 	    "hipped_roof": {
                 "icon": "home",
                 "name": "Hipped roof",
                 "tags": { "roof": "hipped" },
                 "geometry": ["point"],
-                "fields": ["roof"]
+                "fields": ["damage","roof"]
             },
             "pitch_roof": {
                 "icon": "home",
                 "name": "Pitch roof",
                 "tags": { "roof": "pitch" },
                 "geometry": ["point"],
-                "fields": ["roof"]
+                "fields": ["damage","roof"]
             },
   	    "flat_roof": {
                 "icon": "home",
                 "name": "Flat roof",
                 "tags": { "roof": "flat" },
                 "geometry": ["point"],
-                "fields": ["roof"]
+                "fields": ["damage","roof"]
             },
 
 
@@ -130,12 +130,6 @@ document.addEventListener("DOMContentLoaded", function() {
         categories: { },
 
         fields: {
-	"name": {
-    		"key": "name",
-    		"type": "localized",
-    		"label": "Name",
-    		"placeholder": "Common name (if any)"
-	},
             "damage": {
                 "key": "damage",
                 "type": "radio",

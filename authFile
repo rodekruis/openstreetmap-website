@@ -1,0 +1,5 @@
+host=localhost
+database=osm
+user=postgres
+password=pgsql
+dbType=postgresql
