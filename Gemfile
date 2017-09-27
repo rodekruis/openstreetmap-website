@@ -101,6 +101,8 @@ gem "canonical-rails"
 # Used to generate logstash friendly log files
 gem "logstasher"
 
+gem "passenger", ">= 5.0.25", require: "phusion_passenger/rack_handler"
+
 # Gems useful for development
 group :development do
   gem "vendorer"

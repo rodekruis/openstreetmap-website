@@ -22,17 +22,30 @@
     fill: #008000;
 }
 
-.node.tag-damage-some path.stroke {
+.node.tag-damage-partial path.stroke {
     fill: #ffff80;
 }
-.node.tag-damage-some use {
+.node.tag-damage-partial use {
     fill: #806000;
 }
-.preset-icon-fill.tag-damage-some {
+.preset-icon-fill.tag-damage-partial {
     background-color: #ffff80;
 }
-.preset-icon-fill.tag-damage-some + .preset-icon use {
+.preset-icon-fill.tag-damage-partial + .preset-icon use {
     fill: #806000;
+}
+
+.node.tag-damage-significant path.stroke {
+    fill: #ffc080;
+}
+.node.tag-damage-significant use {
+    fill: #806000;
+}
+.preset-icon-fill.tag-damage-significant {
+    background-color: #ffc080;
+}
+.preset-icon-fill.tag-damage-significant + .preset-icon use {
+    fill: #80600;
 }
 
 .node.tag-damage-destroyed path.stroke {

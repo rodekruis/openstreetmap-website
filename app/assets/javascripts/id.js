@@ -57,11 +57,12 @@ document.addEventListener("DOMContentLoaded", function() {
             },
 
             "point": {
-                "name": "Assess Damage",
+                "name": "Roof damage and type",
                 "tags": {},
                 "geometry": ["point"],
-                "fields": ["damage"]
+                "fields": ["damage", "roof"]
             },
+
             "building_no_damage": {
                 "icon": "home",
                 "name": "Building - No Damage",
@@ -69,29 +70,57 @@ document.addEventListener("DOMContentLoaded", function() {
                 "geometry": ["point"],
                 "fields": ["damage"]
             },
-            "building_some_damage": {
+            "building_partial_damage": {
                 "icon": "home",
-                "name": "Building - Some Damage",
-                "tags": { "damage": "some" },
+                "name": "Building - Partial Roof Damage",
+                "tags": { "damage": "partial" },
                 "geometry": ["point"],
                 "fields": ["damage"]
             },
+	    "building_significant_damage": {
+                "icon": "home",
+                "name": "Building - Significant Roof Damage",
+                "tags": { "damage": "significant" },
+                "geometry": ["point"],
+                "fields": ["damage"]
+            },
+
             "building_destroyed": {
                 "icon": "home",
-                "name": "Building - Destroyed",
+                "name": "Building - Walls and roof are down",
                 "tags": { "damage": "destroyed" },
                 "geometry": ["point"],
                 "fields": ["damage"]
             },
+	    "hipped_roof": {
+                "icon": "home",
+                "name": "Hipped roof",
+                "tags": { "roof": "hipped" },
+                "geometry": ["point"],
+                "fields": ["roof"]
+            },
+            "pitch_roof": {
+                "icon": "home",
+                "name": "Pitch roof",
+                "tags": { "roof": "pitch" },
+                "geometry": ["point"],
+                "fields": ["roof"]
+            },
+  	    "flat_roof": {
+                "icon": "home",
+                "name": "Flat roof",
+                "tags": { "roof": "flat" },
+                "geometry": ["point"],
+                "fields": ["roof"]
+            },
+
+
         },
 
         "defaults": {
             "area": [],
             "line": [],
             "point": [
-                "building_no_damage",
-                "building_some_damage",
-                "building_destroyed",
                 "point"
             ],
             "vertex": [],
@@ -101,16 +130,34 @@ document.addEventListener("DOMContentLoaded", function() {
         categories: { },
 
         fields: {
+	"name": {
+    		"key": "name",
+    		"type": "localized",
+    		"label": "Name",
+    		"placeholder": "Common name (if any)"
+	},
             "damage": {
                 "key": "damage",
                 "type": "radio",
                 "label": "Building Damage",
                 "options": [
                     "none",
-                    "some",
+                    "partial",
+		    "significant",
                     "destroyed"
                 ]
+            },
+           "roof": {
+                "key": "roof",
+                "type": "radio",
+                "label": "Roof type",
+                "options": [
+                    "hipped",
+                    "pitch",
+                    "flat"
+                ]
             }
+
         }
     };
 
