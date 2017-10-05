@@ -37,6 +37,9 @@ rake secret
 #read shapefile
 python ogr2osm.py /var/www/vhosts/openstreetmap-website/imports/building_centroids.shp
 
+nano building_centroids.osm
+// replace all <node id="- with <node id=" (basically removing the negative ID's)
+
 ./osmconvert64 ogr2osm/building_centroids.osm -o=ogr2osm/building_centroids.pbf
 
 # create authfile

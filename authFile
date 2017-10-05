@@ -1,5 +1,5 @@
 host=localhost
-database=osm
+database=osm_material
 user=postgres
 password=pgsql
 dbType=postgresql

@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Roof damage and type",
                 "tags": {},
                 "geometry": ["point"],
-                "fields": ["damage", "roof"]
+                "fields": ["damage","roof","material"]
             },
 
             "building_no_damage": {
@@ -68,21 +68,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Building - No Damage",
                 "tags": { "damage": "none" },
                 "geometry": ["point"],
-                "fields": ["damage","roof"]
+                "fields": ["damage","roof","material"]
             },
             "building_partial_damage": {
                 "icon": "home",
                 "name": "Building - Partial Roof Damage",
                 "tags": { "damage": "partial" },
                 "geometry": ["point"],
-                "fields": ["damage","roof"]
+                "fields": ["damage","roof","material"]
             },
 	    "building_significant_damage": {
                 "icon": "home",
                 "name": "Building - Significant Roof Damage",
                 "tags": { "damage": "significant" },
                 "geometry": ["point"],
-                "fields": ["damage","roof"]
+                "fields": ["damage","roof","material"]
             },
 
             "building_destroyed": {
@@ -90,30 +90,88 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Building - Walls and roof are down",
                 "tags": { "damage": "destroyed" },
                 "geometry": ["point"],
-                "fields": ["damage","roof"]
+                "fields": ["damage","roof","material"]
             },
+	    "building_unknown": {
+                "icon": "home",
+                "name": "Building - Damage unknown",
+                "tags": { "damage": "unknown" },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
+            },
+
 	    "hipped_roof": {
                 "icon": "home",
                 "name": "Hipped roof",
                 "tags": { "roof": "hipped" },
                 "geometry": ["point"],
-                "fields": ["damage","roof"]
+                "fields": ["damage","roof","material"]
             },
             "pitch_roof": {
                 "icon": "home",
                 "name": "Pitch roof",
                 "tags": { "roof": "pitch" },
                 "geometry": ["point"],
-                "fields": ["damage","roof"]
+                "fields": ["damage","roof","material"]
             },
   	    "flat_roof": {
                 "icon": "home",
                 "name": "Flat roof",
                 "tags": { "roof": "flat" },
                 "geometry": ["point"],
-                "fields": ["damage","roof"]
+                "fields": ["damage","roof","material"]	
+            },
+	   "unknown_roof": {
+                "icon": "home",
+                "name": "Unknown roof",
+                "tags": { "roof": "unknown" },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
             },
 
+            "roof_concrete": {
+                "icon": "home",
+                "name": "Roof - Concrete",
+                "tags": { "material": 1 },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
+            },
+            "roof_tiles": {
+                "icon": "home",
+                "name": "Roof - tiles",
+                "tags": { "material": 2 },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
+            },
+	    "roof_metal": {
+                "icon": "home",
+                "name": "Roof - metal",
+                "tags": { "material": 3 },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
+            },
+
+            "roof_mixed": {
+                "icon": "home",
+                "name": "Roof - mixed",
+                "tags": { "material": 5 },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
+            },
+	    "roof_unknown": {
+                "icon": "home",
+                "name": "Roof - unknown",
+                "tags": { "material": 4 },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
+            },
+	   "roof_tiles_metal": {
+                "icon": "home",
+                "name": "Roof - Potential tiles or metal",
+                "tags": { "material": 6 },
+                "geometry": ["point"],
+                "fields": ["damage","roof","material"]
+            },
 
         },
 
@@ -138,7 +196,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     "none",
                     "partial",
 		    "significant",
-                    "destroyed"
+                    "destroyed",
+		    "unknown"
                 ]
             },
            "roof": {
@@ -148,10 +207,23 @@ document.addEventListener("DOMContentLoaded", function() {
                 "options": [
                     "hipped",
                     "pitch",
-                    "flat"
+                    "flat",
+		    "unknown"
                 ]
+            },
+           "material": {
+                "key": "material",
+                "type": "radio",
+                "label": "Roof material",
+                "options": [
+		 "1",
+		 "2",
+		 "3",
+		 "5",
+		 "6",
+		 "4"
+		]
             }
-
         }
     };
 

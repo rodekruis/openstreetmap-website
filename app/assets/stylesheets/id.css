@@ -9,6 +9,19 @@
     width: 100%;
 }
 
+.node.tag-damage-unknown path.stroke {
+    fill: #000280;
+}
+.node.tag-damage-unknown use {
+    fill: #000000;
+}
+.preset-icon-fill.tag-damage-unknown {
+    background-color: #000280;
+}
+.preset-icon-fill.tag-damage-unknown + .preset-icon use {
+    fill: #000000;
+}
+
 .node.tag-damage-none path.stroke {
     fill: #80ff80;
 }
