@@ -6,6 +6,8 @@ https://github.com/rodekruis/iD/tree/custom-damage-assessment
 # Change the imagery
 nano data/update_imagery.js
 npm install
+git commit -a -m "update imagery"
+git push
 
 ##openstreetmap-website
 
