@@ -15,7 +15,7 @@ class WayController < ApplicationController
     way = Way.from_xml(request.raw_post, true)
 
     # Assume that Way.from_xml has thrown an exception if there is an error parsing the xml
-    way.create_with_history @user
+    way.create_with_history current_user
     render :plain => way.id.to_s
   end
 
@@ -36,10 +36,10 @@ class WayController < ApplicationController
     new_way = Way.from_xml(request.raw_post)
 
     unless new_way && new_way.id == way.id
-      raise OSM::APIBadUserInput.new("The id in the url (#{way.id}) is not the same as provided in the xml (#{new_way.id})")
+      raise OSM::APIBadUserInput, "The id in the url (#{way.id}) is not the same as provided in the xml (#{new_way.id})"
     end
 
-    way.update_from(new_way, @user)
+    way.update_from(new_way, current_user)
     render :plain => way.version.to_s
   end
 
@@ -49,7 +49,7 @@ class WayController < ApplicationController
     new_way = Way.from_xml(request.raw_post)
 
     if new_way && new_way.id == way.id
-      way.delete_with_history!(new_way, @user)
+      way.delete_with_history!(new_way, current_user)
       render :plain => way.version.to_s
     else
       head :bad_request
@@ -81,14 +81,12 @@ class WayController < ApplicationController
 
   def ways
     unless params["ways"]
-      raise OSM::APIBadUserInput.new("The parameter ways is required, and must be of the form ways=id[,id[,id...]]")
+      raise OSM::APIBadUserInput, "The parameter ways is required, and must be of the form ways=id[,id[,id...]]"
     end
 
     ids = params["ways"].split(",").collect(&:to_i)
 
-    if ids.empty?
-      raise OSM::APIBadUserInput.new("No ways were given to search for")
-    end
+    raise OSM::APIBadUserInput, "No ways were given to search for" if ids.empty?
 
     doc = OSM::API.new.get_xml_doc
 

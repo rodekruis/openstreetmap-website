@@ -98,16 +98,16 @@ class ChangesetControllerTest < ActionController::TestCase
   def test_create
     basic_authorization create(:user, :data_public => false).email, "test"
     # Create the first user's changeset
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
     assert_require_public_data
 
     basic_authorization create(:user).email, "test"
     # Create the first user's changeset
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
 
@@ -178,14 +178,14 @@ class ChangesetControllerTest < ActionController::TestCase
   def test_read
     changeset_id = create(:changeset).id
 
-    get :read, :id => changeset_id
+    get :read, :params => { :id => changeset_id }
     assert_response :success, "cannot get first changeset"
 
     assert_select "osm[version='#{API_VERSION}'][generator='OpenStreetMap server']", 1
     assert_select "osm>changeset[id='#{changeset_id}']", 1
     assert_select "osm>changeset>discussion", 0
 
-    get :read, :id => changeset_id, :include_discussion => true
+    get :read, :params => { :id => changeset_id, :include_discussion => true }
     assert_response :success, "cannot get first changeset with comments"
 
     assert_select "osm[version='#{API_VERSION}'][generator='OpenStreetMap server']", 1
@@ -196,7 +196,7 @@ class ChangesetControllerTest < ActionController::TestCase
     changeset_id = create(:changeset, :closed).id
     create_list(:changeset_comment, 3, :changeset_id => changeset_id)
 
-    get :read, :id => changeset_id, :include_discussion => true
+    get :read, :params => { :id => changeset_id, :include_discussion => true }
     assert_response :success, "cannot get closed changeset with comments"
 
     assert_select "osm[version='#{API_VERSION}'][generator='OpenStreetMap server']", 1
@@ -210,7 +210,7 @@ class ChangesetControllerTest < ActionController::TestCase
   def test_read_not_found
     [0, -32, 233455644, "afg", "213"].each do |id|
       begin
-        get :read, :id => id
+        get :read, :params => { :id => id }
         assert_response :not_found, "should get a not found"
       rescue ActionController::UrlGenerationError => ex
         assert_match /No route matches/, ex.to_s
@@ -227,19 +227,19 @@ class ChangesetControllerTest < ActionController::TestCase
     changeset = create(:changeset, :user => user)
 
     ## Try without authentication
-    put :close, :id => changeset.id
+    put :close, :params => { :id => changeset.id }
     assert_response :unauthorized
 
     ## Try using the non-public user
     basic_authorization private_user.email, "test"
-    put :close, :id => private_changeset.id
+    put :close, :params => { :id => private_changeset.id }
     assert_require_public_data
 
     ## The try with the public user
     basic_authorization user.email, "test"
 
     cs_id = changeset.id
-    put :close, :id => cs_id
+    put :close, :params => { :id => cs_id }
     assert_response :success
 
     # test that it really is closed now
@@ -256,7 +256,7 @@ class ChangesetControllerTest < ActionController::TestCase
 
     basic_authorization user.email, "test"
 
-    put :close, :id => changeset.id
+    put :close, :params => { :id => changeset.id }
     assert_response :conflict
     assert_equal "The user doesn't own that changeset", @response.body
   end
@@ -269,10 +269,10 @@ class ChangesetControllerTest < ActionController::TestCase
 
     basic_authorization user.email, "test"
 
-    get :close, :id => changeset.id
+    get :close, :params => { :id => changeset.id }
     assert_response :method_not_allowed
 
-    post :close, :id => changeset.id
+    post :close, :params => { :id => changeset.id }
     assert_response :method_not_allowed
   end
 
@@ -284,7 +284,7 @@ class ChangesetControllerTest < ActionController::TestCase
     # First try to do it with no auth
     cs_ids.each do |id|
       begin
-        put :close, :id => id
+        put :close, :params => { :id => id }
         assert_response :unauthorized, "Shouldn't be able close the non-existant changeset #{id}, when not authorized"
       rescue ActionController::UrlGenerationError => ex
         assert_match /No route matches/, ex.to_s
@@ -295,7 +295,7 @@ class ChangesetControllerTest < ActionController::TestCase
     basic_authorization create(:user).email, "test"
     cs_ids.each do |id|
       begin
-        put :close, :id => id
+        put :close, :params => { :id => id }
         assert_response :not_found, "The changeset #{id} doesn't exist, so can't be closed"
       rescue ActionController::UrlGenerationError => ex
         assert_match /No route matches/, ex.to_s
@@ -327,7 +327,7 @@ class ChangesetControllerTest < ActionController::TestCase
 
     # simple diff to change a node, way and relation by removing
     # their tags
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset_id}' version='1'/>
@@ -343,11 +343,11 @@ class ChangesetControllerTest < ActionController::TestCase
         </relation>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :unauthorized,
                     "shouldn't be able to upload a simple valid diff to changeset: #{@response.body}"
 
@@ -357,7 +357,7 @@ EOF
 
     # simple diff to change a node, way and relation by removing
     # their tags
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset_id}' version='1'/>
@@ -373,11 +373,11 @@ EOF
         </relation>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :forbidden,
                     "can't upload a simple valid diff to changeset: #{@response.body}"
 
@@ -387,7 +387,7 @@ EOF
 
     # simple diff to change a node, way and relation by removing
     # their tags
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset_id}' version='1'/>
@@ -403,11 +403,11 @@ EOF
         </relation>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :success,
                     "can't upload a simple valid diff to changeset: #{@response.body}"
 
@@ -429,7 +429,7 @@ EOF
     basic_authorization user.email, "test"
 
     # simple diff to create a node way and relation using placeholders
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id='-1' lon='0' lat='0' changeset='#{changeset.id}'>
@@ -448,11 +448,11 @@ EOF
         </relation>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't upload a simple valid creation to changeset: #{@response.body}"
 
@@ -517,7 +517,7 @@ EOF
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't upload a deletion diff to changeset: #{@response.body}"
 
@@ -545,7 +545,7 @@ EOF
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't upload a deletion diff to changeset: #{@response.body}"
 
@@ -561,8 +561,8 @@ EOF
       basic_authorization create(:user).email, "test"
 
       # create a temporary changeset
-      content "<osm><changeset>" +
-              "<tag k='created_by' v='osm test suite checking changesets'/>" +
+      content "<osm><changeset>" \
+              "<tag k='created_by' v='osm test suite checking changesets'/>" \
               "</changeset></osm>"
       assert_difference "Changeset.count", 1 do
         put :create
@@ -582,7 +582,7 @@ EOF
 
     # upload some widely-spaced nodes, spiralling positive and negative to cause
     # largest bbox over-expansion possible.
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id='-1' lon='-20' lat='-10' changeset='#{changeset_id}'/>
@@ -605,12 +605,12 @@ EOF
         <node id='-18' lon='179.9'  lat='89.9' changeset='#{changeset_id}'/>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it, which used to cause an error like "PGError: ERROR:
     # integer out of range" (bug #2152). but shouldn't any more.
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :success,
                     "can't upload a spatially-large diff to changeset: #{@response.body}"
 
@@ -653,7 +653,7 @@ EOF
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :precondition_failed,
                     "shouldn't be able to upload a invalid deletion diff: #{@response.body}"
     assert_equal "Precondition failed: Way #{used_way.id} is still used by relations #{relation.id}.", @response.body
@@ -697,7 +697,7 @@ EOF
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't do a conditional delete of in use objects: #{@response.body}"
 
@@ -739,7 +739,7 @@ EOF
     basic_authorization changeset.user.email, "test"
 
     # simple diff to create a node way and relation using placeholders
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id='-1' lon='0' lat='0' changeset='#{changeset.id}'>
@@ -747,11 +747,11 @@ EOF
         </node>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request,
                     "shoudln't be able to upload too long a tag to changeset: #{@response.body}"
   end
@@ -770,7 +770,7 @@ EOF
     basic_authorization changeset.user.email, "test"
 
     # simple diff to create a node way and relation using placeholders
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id='-1' lon='0' lat='0' changeset='#{changeset.id}'>
@@ -790,11 +790,11 @@ EOF
         </relation>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't upload a complex diff to changeset: #{@response.body}"
 
@@ -832,7 +832,7 @@ EOF
     basic_authorization changeset.user.email, "test"
 
     # simple diff to create a node way and relation using placeholders
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset.id}' version='1'/>
@@ -854,11 +854,11 @@ EOF
         </node>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :conflict,
                     "uploading a diff with multiple changesets should have failed"
 
@@ -878,7 +878,7 @@ EOF
     # change the location of a node multiple times, each time referencing
     # the last version. doesn't this depend on version numbers being
     # sequential?
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset.id}' version='1'/>
@@ -891,11 +891,11 @@ EOF
         <node id='#{node.id}' lon='9' lat='9' changeset='#{changeset.id}' version='8'/>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't upload multiple versions of an element in a diff: #{@response.body}"
 
@@ -914,18 +914,18 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset.id}' version='1'/>
         <node id='#{node.id}' lon='1' lat='1' changeset='#{changeset.id}' version='1'/>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :conflict,
                     "shouldn't be able to upload the same element twice in a diff: #{@response.body}"
   end
@@ -937,17 +937,17 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
        <node id='1' lon='1' lat='1' changeset='#{changeset.id}'/>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request,
                     "shouldn't be able to upload an element without version: #{@response.body}"
   end
@@ -959,15 +959,15 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
         <ping>
          <node id='1' lon='1' lat='1' changeset='#{changeset.id}' />
         </ping>
       </osmChange>
-EOF
+CHANGESET
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request, "Shouldn't be able to upload a diff with the action ping"
     assert_equal @response.body, "Unknown action ping, choices are create, modify, delete"
   end
@@ -985,7 +985,7 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify><node id='#{node.id}' lon='0' lat='0' changeset='#{changeset.id}'
         version='1'></node>
@@ -997,11 +997,11 @@ EOF
          <member type='relation' role='some' ref='#{other_relation.id}'/>
         </relation>
        </modify></osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't upload a valid diff with whitespace variations to changeset: #{@response.body}"
 
@@ -1021,7 +1021,7 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id='-1' lon='0' lat='0' changeset='#{changeset.id}'>
@@ -1035,11 +1035,11 @@ EOF
         <node id='-1' lon='2' lat='2' changeset='#{changeset.id}' version='2'/>
        </delete>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "can't upload a valid diff with re-used placeholders to changeset: #{@response.body}"
 
@@ -1056,7 +1056,7 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id='-1' lon='0' lat='0' changeset='#{changeset.id}' version='1'/>
@@ -1064,11 +1064,11 @@ EOF
         <node id='-1' lon='2' lat='2' changeset='#{changeset.id}' version='2'/>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request,
                     "shouldn't be able to re-use placeholder IDs"
   end
@@ -1082,7 +1082,7 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id="-1" lon="0" lat="0" changeset="#{changeset.id}" version="1"/>
@@ -1096,17 +1096,17 @@ EOF
         </way>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request,
                     "shouldn't be able to use invalid placeholder IDs"
     assert_equal "Placeholder node not found for reference -4 in way -1", @response.body
 
     # the same again, but this time use an existing way
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id="-1" lon="0" lat="0" changeset="#{changeset.id}" version="1"/>
@@ -1120,11 +1120,11 @@ EOF
         </way>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request,
                     "shouldn't be able to use invalid placeholder IDs"
     assert_equal "Placeholder node not found for reference -4 in way #{way.id}", @response.body
@@ -1139,7 +1139,7 @@ EOF
 
     basic_authorization changeset.user.email, "test"
 
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id="-1" lon="0" lat="0" changeset="#{changeset.id}" version="1"/>
@@ -1153,17 +1153,17 @@ EOF
         </relation>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request,
                     "shouldn't be able to use invalid placeholder IDs"
     assert_equal "Placeholder Node not found for reference -4 in relation -1.", @response.body
 
     # the same again, but this time use an existing relation
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <create>
         <node id="-1" lon="0" lat="0" changeset="#{changeset.id}" version="1"/>
@@ -1177,11 +1177,11 @@ EOF
         </relation>
        </create>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :bad_request,
                     "shouldn't be able to use invalid placeholder IDs"
     assert_equal "Placeholder Way not found for reference -1 in relation #{relation.id}.", @response.body
@@ -1193,8 +1193,8 @@ EOF
   def test_upload_node_move
     basic_authorization create(:user).email, "test"
 
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
     assert_response :success
@@ -1214,7 +1214,7 @@ EOF
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :success,
                     "diff should have uploaded OK"
 
@@ -1231,8 +1231,8 @@ EOF
   def test_upload_way_extend
     basic_authorization create(:user).email, "test"
 
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
     assert_response :success
@@ -1254,7 +1254,7 @@ EOF
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :success,
                     "diff should have uploaded OK"
 
@@ -1279,8 +1279,8 @@ EOF
      "<osmChange><modify></modify></osmChange>"].each do |diff|
       # upload it
       content diff
-      post :upload, :id => changeset.id
-      assert_response(:success, "should be able to upload " +
+      post :upload, :params => { :id => changeset.id }
+      assert_response(:success, "should be able to upload " \
                       "empty changeset: " + diff)
     end
   end
@@ -1304,7 +1304,7 @@ EOF
     # upload it
     content diff
     error_format "xml"
-    post :upload, :id => changeset.id
+    post :upload, :params => { :id => changeset.id }
     assert_response :success,
                     "failed to return error in XML format"
 
@@ -1321,28 +1321,28 @@ EOF
     node = create(:node)
 
     ## First try with a non-public user, which should get a forbidden
-    basic_authorization(create(:user, :data_public => false).email, "test")
+    basic_authorization create(:user, :data_public => false).email, "test"
 
     # create a temporary changeset
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
     assert_response :forbidden
 
     ## Now try with a normal user
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
 
     # create a temporary changeset
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
     assert_response :success
     changeset_id = @response.body.to_i
 
     # add a diff to it
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <modify>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset_id}' version='1'/>
@@ -1355,15 +1355,15 @@ EOF
         <node id='#{node.id}' lon='9' lat='9' changeset='#{changeset_id}' version='8'/>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :success,
                     "can't upload multiple versions of an element in a diff: #{@response.body}"
 
-    get :download, :id => changeset_id
+    get :download, :params => { :id => changeset_id }
     assert_response :success
 
     assert_select "osmChange", 1
@@ -1377,11 +1377,11 @@ EOF
   #
   # NOTE: the error turned out to be something else completely!
   def test_josm_upload
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
 
     # create a temporary changeset
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
     assert_response :success
@@ -1418,11 +1418,11 @@ OSMFILE
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :success,
                     "can't upload a diff from JOSM: #{@response.body}"
 
-    get :download, :id => changeset_id
+    get :download, :params => { :id => changeset_id }
     assert_response :success
 
     assert_select "osmChange", 1
@@ -1439,18 +1439,18 @@ OSMFILE
     node = create(:node)
     node2 = create(:node)
     way = create(:way)
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
 
     # create a temporary changeset
-    content "<osm><changeset>" +
-            "<tag k='created_by' v='osm test suite checking changesets'/>" +
+    content "<osm><changeset>" \
+            "<tag k='created_by' v='osm test suite checking changesets'/>" \
             "</changeset></osm>"
     put :create
     assert_response :success
     changeset_id = @response.body.to_i
 
     # add a diff to it
-    diff = <<EOF.strip_heredoc
+    diff = <<CHANGESET.strip_heredoc
       <osmChange>
        <delete>
         <node id='#{node.id}' lon='0' lat='0' changeset='#{changeset_id}' version='1'/>
@@ -1470,15 +1470,15 @@ OSMFILE
         </way>
        </modify>
       </osmChange>
-EOF
+CHANGESET
 
     # upload it
     content diff
-    post :upload, :id => changeset_id
+    post :upload, :params => { :id => changeset_id }
     assert_response :success,
                     "can't upload multiple versions of an element in a diff: #{@response.body}"
 
-    get :download, :id => changeset_id
+    get :download, :params => { :id => changeset_id }
     assert_response :success
 
     assert_select "osmChange", 1
@@ -1500,7 +1500,7 @@ EOF
     _relation = create(:relation, :with_history, :version => 1, :changeset => changeset)
     _relation2 = create(:relation, :with_history, :deleted, :version => 1, :changeset => changeset)
 
-    get :download, :id => changeset.id
+    get :download, :params => { :id => changeset.id }
 
     assert_response :success
     assert_template nil
@@ -1538,12 +1538,12 @@ EOF
     end
 
     # get the bounding box back from the changeset
-    get :read, :id => changeset_id
+    get :read, :params => { :id => changeset_id }
     assert_response :success, "Couldn't read back changeset."
-    assert_select "osm>changeset[min_lon='1.0']", 1
-    assert_select "osm>changeset[max_lon='1.0']", 1
-    assert_select "osm>changeset[min_lat='2.0']", 1
-    assert_select "osm>changeset[max_lat='2.0']", 1
+    assert_select "osm>changeset[min_lon='1.0000000']", 1
+    assert_select "osm>changeset[max_lon='1.0000000']", 1
+    assert_select "osm>changeset[min_lat='2.0000000']", 1
+    assert_select "osm>changeset[max_lat='2.0000000']", 1
 
     # add another node to it
     with_controller(NodeController.new) do
@@ -1553,28 +1553,28 @@ EOF
     end
 
     # get the bounding box back from the changeset
-    get :read, :id => changeset_id
+    get :read, :params => { :id => changeset_id }
     assert_response :success, "Couldn't read back changeset for the second time."
-    assert_select "osm>changeset[min_lon='1.0']", 1
-    assert_select "osm>changeset[max_lon='2.0']", 1
-    assert_select "osm>changeset[min_lat='1.0']", 1
-    assert_select "osm>changeset[max_lat='2.0']", 1
+    assert_select "osm>changeset[min_lon='1.0000000']", 1
+    assert_select "osm>changeset[max_lon='2.0000000']", 1
+    assert_select "osm>changeset[min_lat='1.0000000']", 1
+    assert_select "osm>changeset[max_lat='2.0000000']", 1
 
     # add (delete) a way to it, which contains a point at (3,3)
     with_controller(WayController.new) do
       content update_changeset(way.to_xml, changeset_id)
-      put :delete, :id => way.id
+      put :delete, :params => { :id => way.id }
       assert_response :success, "Couldn't delete a way."
     end
 
     # get the bounding box back from the changeset
-    get :read, :id => changeset_id
+    get :read, :params => { :id => changeset_id }
     assert_response :success, "Couldn't read back changeset for the third time."
     # note that the 3.1 here is because of the bbox overexpansion
-    assert_select "osm>changeset[min_lon='1.0']", 1
-    assert_select "osm>changeset[max_lon='3.1']", 1
-    assert_select "osm>changeset[min_lat='1.0']", 1
-    assert_select "osm>changeset[max_lat='3.1']", 1
+    assert_select "osm>changeset[min_lon='1.0000000']", 1
+    assert_select "osm>changeset[max_lon='3.1000000']", 1
+    assert_select "osm>changeset[min_lat='1.0000000']", 1
+    assert_select "osm>changeset[max_lat='3.1000000']", 1
   end
 
   ##
@@ -1615,17 +1615,17 @@ EOF
 
     # Try and put
     content "<osm><node lon='#{lon}' lat='#{lat}'/></osm>"
-    put :expand_bbox, :id => changeset_id
+    put :expand_bbox, :params => { :id => changeset_id }
     assert_response :method_not_allowed, "shouldn't be able to put a bbox expand"
 
     # Try to get the update
     content "<osm><node lon='#{lon}' lat='#{lat}'/></osm>"
-    get :expand_bbox, :id => changeset_id
+    get :expand_bbox, :params => { :id => changeset_id }
     assert_response :method_not_allowed, "shouldn't be able to get a bbox expand"
 
     # Try to use a hopefully missing changeset
     content "<osm><node lon='#{lon}' lat='#{lat}'/></osm>"
-    post :expand_bbox, :id => changeset_id + 13245
+    post :expand_bbox, :params => { :id => changeset_id + 13245 }
     assert_response :not_found, "shouldn't be able to do a bbox expand on a nonexistant changeset"
   end
 
@@ -1641,77 +1641,78 @@ EOF
     changeset2 = create(:changeset, :min_lat => 5 * GeoRecord::SCALE, :min_lon => 5 * GeoRecord::SCALE, :max_lat => 15 * GeoRecord::SCALE, :max_lon => 15 * GeoRecord::SCALE)
     changeset3 = create(:changeset, :min_lat => 4.5 * GeoRecord::SCALE, :min_lon => 4.5 * GeoRecord::SCALE, :max_lat => 5 * GeoRecord::SCALE, :max_lon => 5 * GeoRecord::SCALE)
 
-    get :query, :bbox => "-10,-10, 10, 10"
+    get :query, :params => { :bbox => "-10,-10, 10, 10" }
     assert_response :success, "can't get changesets in bbox"
     assert_changesets [changeset2, changeset3]
 
-    get :query, :bbox => "4.5,4.5,4.6,4.6"
+    get :query, :params => { :bbox => "4.5,4.5,4.6,4.6" }
     assert_response :success, "can't get changesets in bbox"
     assert_changesets [changeset3]
 
     # not found when looking for changesets of non-existing users
-    get :query, :user => User.maximum(:id) + 1
+    get :query, :params => { :user => User.maximum(:id) + 1 }
     assert_response :not_found
-    get :query, :display_name => " "
+    get :query, :params => { :display_name => " " }
     assert_response :not_found
 
     # can't get changesets of user 1 without authenticating
-    get :query, :user => private_user.id
+    get :query, :params => { :user => private_user.id }
     assert_response :not_found, "shouldn't be able to get changesets by non-public user (ID)"
-    get :query, :display_name => private_user.display_name
+    get :query, :params => { :display_name => private_user.display_name }
     assert_response :not_found, "shouldn't be able to get changesets by non-public user (name)"
 
     # but this should work
     basic_authorization private_user.email, "test"
-    get :query, :user => private_user.id
+    get :query, :params => { :user => private_user.id }
     assert_response :success, "can't get changesets by user ID"
     assert_changesets [private_user_changeset, private_user_closed_changeset]
 
-    get :query, :display_name => private_user.display_name
+    get :query, :params => { :display_name => private_user.display_name }
     assert_response :success, "can't get changesets by user name"
     assert_changesets [private_user_changeset, private_user_closed_changeset]
 
     # check that the correct error is given when we provide both UID and name
-    get :query, :user => private_user.id, :display_name => private_user.display_name
+    get :query, :params => { :user => private_user.id,
+                             :display_name => private_user.display_name }
     assert_response :bad_request, "should be a bad request to have both ID and name specified"
 
-    get :query, :user => private_user.id, :open => true
+    get :query, :params => { :user => private_user.id, :open => true }
     assert_response :success, "can't get changesets by user and open"
     assert_changesets [private_user_changeset]
 
-    get :query, :time => "2007-12-31"
+    get :query, :params => { :time => "2007-12-31" }
     assert_response :success, "can't get changesets by time-since"
     assert_changesets [private_user_changeset, private_user_closed_changeset, changeset, closed_changeset, changeset2, changeset3]
 
-    get :query, :time => "2008-01-01T12:34Z"
+    get :query, :params => { :time => "2008-01-01T12:34Z" }
     assert_response :success, "can't get changesets by time-since with hour"
     assert_changesets [private_user_changeset, private_user_closed_changeset, changeset, closed_changeset, changeset2, changeset3]
 
-    get :query, :time => "2007-12-31T23:59Z,2008-01-02T00:01Z"
+    get :query, :params => { :time => "2007-12-31T23:59Z,2008-01-02T00:01Z" }
     assert_response :success, "can't get changesets by time-range"
     assert_changesets [closed_changeset]
 
-    get :query, :open => "true"
+    get :query, :params => { :open => "true" }
     assert_response :success, "can't get changesets by open-ness"
     assert_changesets [private_user_changeset, changeset, changeset2, changeset3]
 
-    get :query, :closed => "true"
+    get :query, :params => { :closed => "true" }
     assert_response :success, "can't get changesets by closed-ness"
     assert_changesets [private_user_closed_changeset, closed_changeset]
 
-    get :query, :closed => "true", :user => private_user.id
+    get :query, :params => { :closed => "true", :user => private_user.id }
     assert_response :success, "can't get changesets by closed-ness and user"
     assert_changesets [private_user_closed_changeset]
 
-    get :query, :closed => "true", :user => user.id
+    get :query, :params => { :closed => "true", :user => user.id }
     assert_response :success, "can't get changesets by closed-ness and user"
     assert_changesets [closed_changeset]
 
-    get :query, :changesets => "#{private_user_changeset.id},#{changeset.id},#{closed_changeset.id}"
+    get :query, :params => { :changesets => "#{private_user_changeset.id},#{changeset.id},#{closed_changeset.id}" }
     assert_response :success, "can't get changesets by id (as comma-separated string)"
     assert_changesets [private_user_changeset, changeset, closed_changeset]
 
-    get :query, :changesets => ""
+    get :query, :params => { :changesets => "" }
     assert_response :bad_request, "should be a bad request since changesets is empty"
   end
 
@@ -1722,7 +1723,7 @@ EOF
     ["abracadabra!",
      "1,2,3,F",
      ";drop table users;"].each do |bbox|
-      get :query, :bbox => bbox
+      get :query, :params => { :bbox => bbox }
       assert_response :bad_request, "'#{bbox}' isn't a bbox"
     end
 
@@ -1731,7 +1732,7 @@ EOF
      ";drop table users;",
      ",",
      "-,-"].each do |time|
-      get :query, :time => time
+      get :query, :params => { :time => time }
       assert_response :bad_request, "'#{time}' isn't a valid time range"
     end
 
@@ -1739,7 +1740,7 @@ EOF
      "foobar",
      "-1",
      "0"].each do |uid|
-      get :query, :user => uid
+      get :query, :params => { :user => uid }
       assert_response :bad_request, "'#{uid}' isn't a valid user ID"
     end
   end
@@ -1761,17 +1762,17 @@ EOF
     content new_changeset
 
     # try without any authorization
-    put :update, :id => private_changeset.id
+    put :update, :params => { :id => private_changeset.id }
     assert_response :unauthorized
 
     # try with the wrong authorization
     basic_authorization create(:user).email, "test"
-    put :update, :id => private_changeset.id
+    put :update, :params => { :id => private_changeset.id }
     assert_response :conflict
 
     # now this should get an unauthorized
     basic_authorization private_user.email, "test"
-    put :update, :id => private_changeset.id
+    put :update, :params => { :id => private_changeset.id }
     assert_require_public_data "user with their data non-public, shouldn't be able to edit their changeset"
 
     ## Now try with the public user
@@ -1785,17 +1786,17 @@ EOF
 
     # try without any authorization
     @request.env["HTTP_AUTHORIZATION"] = nil
-    put :update, :id => changeset.id
+    put :update, :params => { :id => changeset.id }
     assert_response :unauthorized
 
     # try with the wrong authorization
     basic_authorization create(:user).email, "test"
-    put :update, :id => changeset.id
+    put :update, :params => { :id => changeset.id }
     assert_response :conflict
 
     # now this should work...
     basic_authorization user.email, "test"
-    put :update, :id => changeset.id
+    put :update, :params => { :id => changeset.id }
     assert_response :success
 
     assert_select "osm>changeset[id='#{changeset.id}']", 1
@@ -1817,7 +1818,7 @@ EOF
     new_changeset.find("//osm/changeset").first << new_tag
 
     content new_changeset
-    put :update, :id => changeset.id
+    put :update, :params => { :id => changeset.id }
     assert_response :conflict
   end
 
@@ -1848,7 +1849,7 @@ EOF
       assert_response :success, "can't create a new node"
       node_id = @response.body.to_i
 
-      get :read, :id => node_id
+      get :read, :params => { :id => node_id }
       assert_response :success, "can't read back new node"
       node_doc = XML::Parser.string(@response.body).parse
       node_xml = node_doc.find("//osm/node").first
@@ -1860,7 +1861,7 @@ EOF
         node_xml["version"] = (i + 1).to_s
 
         content node_doc
-        put :update, :id => node_id
+        put :update, :params => { :id => node_id }
         assert_response :success, "attempt #{i} should have succeeded"
       end
 
@@ -1870,7 +1871,7 @@ EOF
       node_xml["version"] = offset.to_s
 
       content node_doc
-      put :update, :id => node_id
+      put :update, :params => { :id => node_id }
       assert_response :conflict, "final attempt should have failed"
     end
 
@@ -1879,20 +1880,20 @@ EOF
 
     # check that the changeset is now closed as well
     assert(!changeset.is_open?,
-           "changeset should have been auto-closed by exceeding " +
+           "changeset should have been auto-closed by exceeding " \
            "element limit.")
   end
 
   ##
   # This should display the last 20 changesets closed
   def test_list
-    get :list, :format => "html"
+    get :list, :params => { :format => "html" }
     assert_response :success
     assert_template "history"
     assert_template :layout => "map"
     assert_select "h2", :text => "Changesets", :count => 1
 
-    xhr :get, :list, :format => "html", :list => "1"
+    get :list, :params => { :format => "html", :list => "1" }, :xhr => true
     assert_response :success
     assert_template "list"
 
@@ -1902,13 +1903,13 @@ EOF
   ##
   # This should display the last 20 changesets closed
   def test_list_xhr
-    xhr :get, :list, :format => "html"
+    get :list, :params => { :format => "html" }, :xhr => true
     assert_response :success
     assert_template "history"
     assert_template :layout => "xhr"
     assert_select "h2", :text => "Changesets", :count => 1
 
-    xhr :get, :list, :format => "html", :list => "1"
+    get :list, :params => { :format => "html", :list => "1" }, :xhr => true
     assert_response :success
     assert_template "list"
 
@@ -1918,13 +1919,13 @@ EOF
   ##
   # This should display the last 20 changesets closed in a specific area
   def test_list_bbox
-    get :list, :format => "html", :bbox => "4.5,4.5,5.5,5.5"
+    get :list, :params => { :format => "html", :bbox => "4.5,4.5,5.5,5.5" }
     assert_response :success
     assert_template "history"
     assert_template :layout => "map"
     assert_select "h2", :text => "Changesets", :count => 1
 
-    xhr :get, :list, :format => "html", :bbox => "4.5,4.5,5.5,5.5", :list => "1"
+    get :list, :params => { :format => "html", :bbox => "4.5,4.5,5.5,5.5", :list => "1" }, :xhr => true
     assert_response :success
     assert_template "list"
 
@@ -1938,11 +1939,11 @@ EOF
     create(:changeset, :user => user)
     create(:changeset, :closed, :user => user)
 
-    get :list, :format => "html", :display_name => user.display_name
+    get :list, :params => { :format => "html", :display_name => user.display_name }
     assert_response :success
     assert_template "history"
 
-    xhr :get, :list, :format => "html", :display_name => user.display_name, :list => "1"
+    get :list, :params => { :format => "html", :display_name => user.display_name, :list => "1" }, :xhr => true
     assert_response :success
     assert_template "list"
 
@@ -1956,11 +1957,11 @@ EOF
     create(:changeset, :user => private_user)
     create(:changeset, :closed, :user => private_user)
 
-    get :list, :format => "html", :display_name => private_user.display_name
+    get :list, :params => { :format => "html", :display_name => private_user.display_name }
     assert_response :success
     assert_template "history"
 
-    xhr :get, :list, :format => "html", :display_name => private_user.display_name, :list => "1"
+    get :list, :params => { :format => "html", :display_name => private_user.display_name, :list => "1" }, :xhr => true
     assert_response :success
     assert_template "list"
 
@@ -1970,11 +1971,11 @@ EOF
   ##
   # Check the not found of the list user changesets
   def test_list_user_not_found
-    get :list, :format => "html", :display_name => "Some random user"
+    get :list, :params => { :format => "html", :display_name => "Some random user" }
     assert_response :not_found
     assert_template "user/no_such_user"
 
-    xhr :get, :list, :format => "html", :display_name => "Some random user", :list => "1"
+    get :list, :params => { :format => "html", :display_name => "Some random user", :list => "1" }, :xhr => true
     assert_response :not_found
     assert_template "user/no_such_user"
   end
@@ -1986,17 +1987,17 @@ EOF
     friend = create(:friend, :befriender => private_user)
     create(:changeset, :user => friend.befriendee)
 
-    get :list, :friends => true
+    get :list, :params => { :friends => true }
     assert_response :redirect
     assert_redirected_to :controller => :user, :action => :login, :referer => friend_changesets_path
 
     session[:user] = private_user.id
 
-    get :list, :friends => true
+    get :list, :params => { :friends => true }
     assert_response :success
     assert_template "history"
 
-    xhr :get, :list, :friends => true, :list => "1"
+    get :list, :params => { :friends => true, :list => "1" }, :xhr => true
     assert_response :success
     assert_template "list"
 
@@ -2010,17 +2011,17 @@ EOF
     user = create(:user, :home_lat => 51.0, :home_lon => 1.0)
     create(:changeset, :user => user)
 
-    get :list, :nearby => true
+    get :list, :params => { :nearby => true }
     assert_response :redirect
     assert_redirected_to :controller => :user, :action => :login, :referer => nearby_changesets_path
 
     session[:user] = private_user.id
 
-    get :list, :nearby => true
+    get :list, :params => { :nearby => true }
     assert_response :success
     assert_template "history"
 
-    xhr :get, :list, :nearby => true, :list => "1"
+    get :list, :params => { :nearby => true, :list => "1" }, :xhr => true
     assert_response :success
     assert_template "list"
 
@@ -2030,17 +2031,29 @@ EOF
   ##
   # Check that we can't request later pages of the changesets list
   def test_list_max_id
-    xhr :get, :list, :format => "html", :max_id => 4
+    get :list, :params => { :format => "html", :max_id => 4 }, :xhr => true
     assert_response :success
     assert_template "history"
     assert_template :layout => "xhr"
     assert_select "h2", :text => "Changesets", :count => 1
 
-    xhr :get, :list, :format => "html", :list => "1", :max_id => 4
+    get :list, :params => { :format => "html", :list => "1", :max_id => 4 }, :xhr => true
     assert_response :success
     assert_template "list"
 
     check_list_result(Changeset.where("id <= 4"))
+  end
+
+  ##
+  # Check that a list with a next page link works
+  def test_list_more
+    create_list(:changeset, 50)
+
+    get :list, :params => { :format => "html" }
+    assert_response :success
+
+    get :list, :params => { :format => "html" }, :xhr => true
+    assert_response :success
   end
 
   ##
@@ -2050,7 +2063,7 @@ EOF
     closed_changeset = create(:changeset, :closed, :num_changes => 1)
     _empty_changeset = create(:changeset, :num_changes => 0)
 
-    get :feed, :format => :atom
+    get :feed, :params => { :format => :atom }
     assert_response :success
     assert_template "list"
     assert_equal "application/atom+xml", response.content_type
@@ -2066,7 +2079,7 @@ EOF
     _elsewhere_changeset = create(:changeset, :num_changes => 1, :min_lat => -5 * GeoRecord::SCALE, :min_lon => -5 * GeoRecord::SCALE, :max_lat => -5 * GeoRecord::SCALE, :max_lon => -5 * GeoRecord::SCALE)
     _empty_changeset = create(:changeset, :num_changes => 0, :min_lat => -5 * GeoRecord::SCALE, :min_lon => -5 * GeoRecord::SCALE, :max_lat => -5 * GeoRecord::SCALE, :max_lon => -5 * GeoRecord::SCALE)
 
-    get :feed, :format => :atom, :bbox => "4.5,4.5,5.5,5.5"
+    get :feed, :params => { :format => :atom, :bbox => "4.5,4.5,5.5,5.5" }
     assert_response :success
     assert_template "list"
     assert_equal "application/atom+xml", response.content_type
@@ -2081,7 +2094,8 @@ EOF
     changesets = create_list(:changeset, 3, :user => user, :num_changes => 4)
     _other_changeset = create(:changeset)
 
-    get :feed, :format => :atom, :display_name => user.display_name
+    get :feed, :params => { :format => :atom, :display_name => user.display_name }
+
     assert_response :success
     assert_template "list"
     assert_equal "application/atom+xml", response.content_type
@@ -2092,14 +2106,14 @@ EOF
   ##
   # Check the not found of the user changesets feed
   def test_feed_user_not_found
-    get :feed, :format => "atom", :display_name => "Some random user"
+    get :feed, :params => { :format => "atom", :display_name => "Some random user" }
     assert_response :not_found
   end
 
   ##
   # Check that we can't request later pages of the changesets feed
   def test_feed_max_id
-    get :feed, :format => "atom", :max_id => 100
+    get :feed, :params => { :format => "atom", :max_id => 100 }
     assert_response :redirect
     assert_redirected_to :action => :feed
   end
@@ -2113,7 +2127,7 @@ EOF
     node_v1 = node.old_nodes.find_by(:version => 1)
     node_v1.redact!(create(:redaction))
 
-    get :download, :id => changeset.id
+    get :download, :params => { :id => changeset.id }
     assert_response :success
 
     assert_select "osmChange", 1
@@ -2133,11 +2147,11 @@ EOF
     deleted_user = create(:user, :deleted)
     private_user_closed_changeset = create(:changeset, :closed, :user => private_user)
 
-    basic_authorization(user.email, "test")
+    basic_authorization user.email, "test"
 
     assert_difference "ChangesetComment.count", 1 do
       assert_no_difference "ActionMailer::Base.deliveries.size" do
-        post :comment, :id => private_user_closed_changeset.id, :text => "This is a comment"
+        post :comment, :params => { :id => private_user_closed_changeset.id, :text => "This is a comment" }
       end
     end
     assert_response :success
@@ -2150,7 +2164,7 @@ EOF
 
     assert_difference "ChangesetComment.count", 1 do
       assert_difference "ActionMailer::Base.deliveries.size", 1 do
-        post :comment, :id => changeset.id, :text => "This is a comment"
+        post :comment, :params => { :id => changeset.id, :text => "This is a comment" }
       end
     end
     assert_response :success
@@ -2162,11 +2176,11 @@ EOF
 
     ActionMailer::Base.deliveries.clear
 
-    basic_authorization(user2.email, "test")
+    basic_authorization user2.email, "test"
 
     assert_difference "ChangesetComment.count", 1 do
       assert_difference "ActionMailer::Base.deliveries.size", 2 do
-        post :comment, :id => changeset.id, :text => "This is a comment"
+        post :comment, :params => { :id => changeset.id, :text => "This is a comment" }
       end
     end
     assert_response :success
@@ -2188,32 +2202,32 @@ EOF
   # create comment fail
   def test_create_comment_fail
     # unauthorized
-    post :comment, :id => create(:changeset, :closed).id, :text => "This is a comment"
+    post :comment, :params => { :id => create(:changeset, :closed).id, :text => "This is a comment" }
     assert_response :unauthorized
 
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
 
     # bad changeset id
     assert_no_difference "ChangesetComment.count" do
-      post :comment, :id => 999111, :text => "This is a comment"
+      post :comment, :params => { :id => 999111, :text => "This is a comment" }
     end
     assert_response :not_found
 
     # not closed changeset
     assert_no_difference "ChangesetComment.count" do
-      post :comment, :id => create(:changeset).id, :text => "This is a comment"
+      post :comment, :params => { :id => create(:changeset).id, :text => "This is a comment" }
     end
     assert_response :conflict
 
     # no text
     assert_no_difference "ChangesetComment.count" do
-      post :comment, :id => create(:changeset, :closed).id
+      post :comment, :params => { :id => create(:changeset, :closed).id }
     end
     assert_response :bad_request
 
     # empty text
     assert_no_difference "ChangesetComment.count" do
-      post :comment, :id => create(:changeset, :closed).id, :text => ""
+      post :comment, :params => { :id => create(:changeset, :closed).id, :text => "" }
     end
     assert_response :bad_request
   end
@@ -2221,11 +2235,11 @@ EOF
   ##
   # test subscribe success
   def test_subscribe_success
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
     changeset = create(:changeset, :closed)
 
     assert_difference "changeset.subscribers.count", 1 do
-      post :subscribe, :id => changeset.id
+      post :subscribe, :params => { :id => changeset.id }
     end
     assert_response :success
   end
@@ -2238,22 +2252,22 @@ EOF
     # unauthorized
     changeset = create(:changeset, :closed)
     assert_no_difference "changeset.subscribers.count" do
-      post :subscribe, :id => changeset.id
+      post :subscribe, :params => { :id => changeset.id }
     end
     assert_response :unauthorized
 
-    basic_authorization(user.email, "test")
+    basic_authorization user.email, "test"
 
     # bad changeset id
     assert_no_difference "changeset.subscribers.count" do
-      post :subscribe, :id => 999111
+      post :subscribe, :params => { :id => 999111 }
     end
     assert_response :not_found
 
     # not closed changeset
     changeset = create(:changeset)
     assert_no_difference "changeset.subscribers.count" do
-      post :subscribe, :id => changeset.id
+      post :subscribe, :params => { :id => changeset.id }
     end
     assert_response :conflict
 
@@ -2261,7 +2275,7 @@ EOF
     changeset = create(:changeset, :closed)
     changeset.subscribers.push(user)
     assert_no_difference "changeset.subscribers.count" do
-      post :subscribe, :id => changeset.id
+      post :subscribe, :params => { :id => changeset.id }
     end
     assert_response :conflict
   end
@@ -2270,12 +2284,12 @@ EOF
   # test unsubscribe success
   def test_unsubscribe_success
     user = create(:user)
-    basic_authorization(user.email, "test")
+    basic_authorization user.email, "test"
     changeset = create(:changeset, :closed)
     changeset.subscribers.push(user)
 
     assert_difference "changeset.subscribers.count", -1 do
-      post :unsubscribe, :id => changeset.id
+      post :unsubscribe, :params => { :id => changeset.id }
     end
     assert_response :success
   end
@@ -2286,29 +2300,29 @@ EOF
     # unauthorized
     changeset = create(:changeset, :closed)
     assert_no_difference "changeset.subscribers.count" do
-      post :unsubscribe, :id => changeset.id
+      post :unsubscribe, :params => { :id => changeset.id }
     end
     assert_response :unauthorized
 
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
 
     # bad changeset id
     assert_no_difference "changeset.subscribers.count" do
-      post :unsubscribe, :id => 999111
+      post :unsubscribe, :params => { :id => 999111 }
     end
     assert_response :not_found
 
     # not closed changeset
     changeset = create(:changeset)
     assert_no_difference "changeset.subscribers.count" do
-      post :unsubscribe, :id => changeset.id
+      post :unsubscribe, :params => { :id => changeset.id }
     end
     assert_response :conflict
 
     # trying to unsubscribe when not subscribed
     changeset = create(:changeset, :closed)
     assert_no_difference "changeset.subscribers.count" do
-      post :unsubscribe, :id => changeset.id
+      post :unsubscribe, :params => { :id => changeset.id }
     end
     assert_response :not_found
   end
@@ -2320,21 +2334,21 @@ EOF
     comment = create(:changeset_comment)
     assert_equal true, comment.visible
 
-    post :hide_comment, :id => comment.id
+    post :hide_comment, :params => { :id => comment.id }
     assert_response :unauthorized
     assert_equal true, comment.reload.visible
 
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
 
     # not a moderator
-    post :hide_comment, :id => comment.id
+    post :hide_comment, :params => { :id => comment.id }
     assert_response :forbidden
     assert_equal true, comment.reload.visible
 
-    basic_authorization(create(:moderator_user).email, "test")
+    basic_authorization create(:moderator_user).email, "test"
 
     # bad comment id
-    post :hide_comment, :id => 999111
+    post :hide_comment, :params => { :id => 999111 }
     assert_response :not_found
     assert_equal true, comment.reload.visible
   end
@@ -2345,9 +2359,9 @@ EOF
     comment = create(:changeset_comment)
     assert_equal true, comment.visible
 
-    basic_authorization(create(:moderator_user).email, "test")
+    basic_authorization create(:moderator_user).email, "test"
 
-    post :hide_comment, :id => comment.id
+    post :hide_comment, :params => { :id => comment.id }
     assert_response :success
     assert_equal false, comment.reload.visible
   end
@@ -2359,21 +2373,21 @@ EOF
     comment = create(:changeset_comment, :visible => false)
     assert_equal false, comment.visible
 
-    post :unhide_comment, :id => comment.id
+    post :unhide_comment, :params => { :id => comment.id }
     assert_response :unauthorized
     assert_equal false, comment.reload.visible
 
-    basic_authorization(create(:user).email, "test")
+    basic_authorization create(:user).email, "test"
 
     # not a moderator
-    post :unhide_comment, :id => comment.id
+    post :unhide_comment, :params => { :id => comment.id }
     assert_response :forbidden
     assert_equal false, comment.reload.visible
 
-    basic_authorization(create(:moderator_user).email, "test")
+    basic_authorization create(:moderator_user).email, "test"
 
     # bad comment id
-    post :unhide_comment, :id => 999111
+    post :unhide_comment, :params => { :id => 999111 }
     assert_response :not_found
     assert_equal false, comment.reload.visible
   end
@@ -2384,9 +2398,9 @@ EOF
     comment = create(:changeset_comment, :visible => false)
     assert_equal false, comment.visible
 
-    basic_authorization(create(:moderator_user).email, "test")
+    basic_authorization create(:moderator_user).email, "test"
 
-    post :unhide_comment, :id => comment.id
+    post :unhide_comment, :params => { :id => comment.id }
     assert_response :success
     assert_equal true, comment.reload.visible
   end
@@ -2397,7 +2411,7 @@ EOF
     changeset = create(:changeset, :closed)
     create_list(:changeset_comment, 3, :changeset => changeset)
 
-    get :comments_feed, :format => "rss"
+    get :comments_feed, :params => { :format => "rss" }
     assert_response :success
     assert_equal "application/rss+xml", @response.content_type
     assert_select "rss", :count => 1 do
@@ -2406,7 +2420,7 @@ EOF
       end
     end
 
-    get :comments_feed, :format => "rss", :limit => 2
+    get :comments_feed, :params => { :format => "rss", :limit => 2 }
     assert_response :success
     assert_equal "application/rss+xml", @response.content_type
     assert_select "rss", :count => 1 do
@@ -2415,7 +2429,7 @@ EOF
       end
     end
 
-    get :comments_feed, :id => changeset.id, :format => "rss"
+    get :comments_feed, :params => { :id => changeset.id, :format => "rss" }
     assert_response :success
     assert_equal "application/rss+xml", @response.content_type
     assert_select "rss", :count => 1 do
@@ -2428,10 +2442,10 @@ EOF
   ##
   # test comments feed
   def test_comments_feed_bad_limit
-    get :comments_feed, :format => "rss", :limit => 0
+    get :comments_feed, :params => { :format => "rss", :limit => 0 }
     assert_response :bad_request
 
-    get :comments_feed, :format => "rss", :limit => 100001
+    get :comments_feed, :params => { :format => "rss", :limit => 100001 }
     assert_response :bad_request
   end
 
@@ -2451,7 +2465,7 @@ EOF
   # call the include method and assert properties of the bbox
   def check_after_include(changeset_id, lon, lat, bbox)
     content "<osm><node lon='#{lon}' lat='#{lat}'/></osm>"
-    post :expand_bbox, :id => changeset_id
+    post :expand_bbox, :params => { :id => changeset_id }
     assert_response :success, "Setting include of changeset failed: #{@response.body}"
 
     # check exactly one changeset

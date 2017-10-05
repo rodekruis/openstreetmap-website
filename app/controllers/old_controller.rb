@@ -19,7 +19,7 @@ class OldController < ApplicationController
     # the .where() method used in the lookup_old_element_versions
     # call won't throw an error if no records are found, so we have
     # to do that ourselves.
-    raise OSM::APINotFoundError.new if @elements.empty?
+    raise OSM::APINotFoundError if @elements.empty?
 
     doc = OSM::API.new.get_xml_doc
 
@@ -70,6 +70,6 @@ class OldController < ApplicationController
   private
 
   def show_redactions?
-    @user && @user.moderator? && params[:show_redactions] == "true"
+    current_user && current_user.moderator? && params[:show_redactions] == "true"
   end
 end
