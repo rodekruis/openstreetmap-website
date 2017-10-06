@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Roof damage and type",
                 "tags": {},
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"],
+                "fields": ["damage","roof","material"],
 		"matchScore": 0.1
             },
 
@@ -73,21 +73,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Building - No Damage",
                 "tags": { "damage": "none" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
             "building_partial_damage": {
                 "icon": "home",
                 "name": "Building - Partial Roof Damage",
                 "tags": { "damage": "partial" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 	    "building_significant_damage": {
                 "icon": "home",
                 "name": "Building - Significant Roof Damage",
                 "tags": { "damage": "significant" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 
             "building_destroyed": {
@@ -95,14 +95,14 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Building - Walls and roof are down",
                 "tags": { "damage": "destroyed" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 	    "building_unknown": {
                 "icon": "home",
                 "name": "Building - Damage unknown",
                 "tags": { "damage": "unknown" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 
 	    "hipped_roof": {
@@ -110,28 +110,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Hipped roof",
                 "tags": { "roof": "hipped" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
             "pitch_roof": {
                 "icon": "home",
                 "name": "Pitch roof",
                 "tags": { "roof": "pitch" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
   	    "flat_roof": {
                 "icon": "home",
                 "name": "Flat roof",
                 "tags": { "roof": "flat" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 	   "unknown_roof": {
                 "icon": "home",
                 "name": "Unknown roof",
                 "tags": { "roof": "unknown" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 
             "roof_concrete": {
@@ -139,21 +139,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Roof - Concrete",
                 "tags": { "material": "1" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
             "roof_tiles": {
                 "icon": "home",
                 "name": "Roof - tiles",
                 "tags": { "material": "2" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 	    "roof_metal": {
                 "icon": "home",
                 "name": "Roof - metal",
                 "tags": { "material": "3" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 
             "roof_mixed": {
@@ -161,21 +161,21 @@ document.addEventListener("DOMContentLoaded", function() {
                 "name": "Roof - mixed",
                 "tags": { "material": "5" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 	    "roof_unknown": {
                 "icon": "home",
                 "name": "Roof - unknown",
                 "tags": { "material": "4" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 	   "roof_tiles_metal": {
                 "icon": "home",
                 "name": "Roof - Potential tiles or metal",
                 "tags": { "material": "6" },
                 "geometry": ["point"],
-                "fields": ["damage","roof","material", "name"]
+                "fields": ["damage","roof","material"]
             },
 
         },
@@ -193,13 +193,32 @@ document.addEventListener("DOMContentLoaded", function() {
         categories: { },
 
         fields: {
-	  "name": {
-                "key": "name",
-                "type": "localized",
-                "label": "Name",
-                "placeholder": "Common name (if any)"
-            },
-  
+	  "comment": {
+    		"key": "comment",
+   		"type": "textarea",
+    		"label": "Changeset Comment",
+   		"placeholder": "Brief description of your contributions (required)"
+	  },
+	  "hashtags":	{
+    		"key": "hashtags",
+    		"type": "semiCombo",
+    		"label": "Suggested Hashtags",
+    		"placeholder": "#example"
+	  },
+	  "source": {
+		"key": "source",
+    		"type": "semiCombo",
+    		"icon": "source",
+    		"universal": true,
+    		"label": "Sources",
+   		"options": [
+       			 "survey",
+        		"local knowledge",
+        		"gps",
+        		"aerial imagery",
+        		"streetlevel imagery"
+    		]
+	  },
           "damage": {
                 "key": "damage",
                 "type": "radio",
@@ -248,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function() {
     //
     var f = id.features().features();
     f.points.currentMax = f.points.defaultMax = 300;
-    f.buildings.currentMax = f.buildings.defaultMax = 300;
+    //f.buildings.currentMax = f.buildings.defaultMax = 300;
 
 
     id.map().on('move.embed', parent.$.throttle(250, function() {
