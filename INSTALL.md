@@ -214,7 +214,17 @@ Note that the OSM map tiles you see aren't created from your local database - th
 
 ### Running in production
 
-Install Apache2 and add a site to /etc/apache2/sites-available/openstreetmap-website.conf with the following content:
+Install Apache2 
+
+```
+sudo apt-get update
+sudo apt-get install apache2
+
+sudo apt-get install libapache2-mod-passenger
+sudo a2enmod passenger
+```
+
+Add a site to /etc/apache2/sites-available/openstreetmap-website.conf with the following content:
 
 ```
 <VirtualHost *:80>
