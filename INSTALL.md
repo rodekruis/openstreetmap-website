@@ -212,6 +212,36 @@ You can now view the site in your favourite web-browser at `http://localhost:300
 
 Note that the OSM map tiles you see aren't created from your local database - they are just the standard map tiles.
 
+### Running in production
+
+Install Apache2 and add a site to /etc/apache2/sites-available/openstreetmap-website.conf with the following content:
+
+```
+<VirtualHost *:80>
+
+      ServerAdmin info@510.global
+      ServerName openstreetmap.missingmaps.nl
+
+      DocumentRoot /var/www/vhosts/openstreetmap-website/public
+
+      PassengerRuby /usr/bin/ruby
+
+# Relax Apache security settings
+    <Directory /var/www/vhosts/openstreetmap-website/public>
+      Allow from all
+      Options -MultiViews
+      # Uncomment this if you're on Apache >= 2.4:
+      Require all granted
+    </Directory>
+
+</VirtualHost>
+```
+Enable the site with:
+```
+a2ensite openstreetmap-website
+sudo service apache2 restart
+```
+
 # Configuration
 
 After installing this software, you may need to carry out some [configuration steps](CONFIGURE.md), depending on your tasks.
