@@ -229,7 +229,7 @@ Add a site to /etc/apache2/sites-available/openstreetmap-website.conf with the f
 ```
 <VirtualHost *:80>
 
-      ServerAdmin info@510.global
+      ServerAdmin info@website.com
       ServerName openstreetmap.missingmaps.nl
 
       DocumentRoot /var/www/vhosts/openstreetmap-website/public
