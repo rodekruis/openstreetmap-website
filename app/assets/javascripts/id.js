@@ -260,8 +260,9 @@ document.addEventListener("DOMContentLoaded", function() {
     };
 
     id.presets().init();
-
-
+ 
+    //Set minmum zoom level to 16, to allow better overview when filtered
+    id.minEditableZoom(16);
     //
     // override feature filter limits
     //
